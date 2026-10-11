@@ -1,12 +1,12 @@
 # All the numbers and paths a run needs, in one place — nothing below should be
 # hardcoded in src/. Override any key from the CLI, e.g.:
-#   python -m wine_origin train --override model.random_forest.n_estimators=300
+#   python -m cataclysm train --override model.random_forest.n_estimators=300
 
 seed: 42
 
 paths:
-  raw_data: data/raw/wine.csv
-  checksums: data/raw/CHECKSUMS.txt
+  raw_data: data/raw/*.csv
+  checksums: data/raw/*.txt
   model: models/model.joblib
   metrics: results/metrics.json
   confusion_matrix: results/figures/confusion_matrix.png

@@ -60,7 +60,7 @@ presenting it as your own collected data in anything beyond a course project con
 ## `data/raw/` vs. `data/interim/` vs. `data/processed/`
 
 This project's pipeline is simple enough to go straight from `data/raw/wine.csv` to
-features in memory (see `src/wine_origin/features.py`) — so `data/interim/` and
+features in memory (see `src/cataclysm/features.py`) — so `data/interim/` and
 `data/processed/` are currently empty (just a `.gitkeep` each, so the folders exist
 after a fresh clone). If your project adds a real multi-step pipeline — e.g.
 cleaning/joining raw sources into an intermediate form, then engineering features from
@@ -75,13 +75,13 @@ python scripts/download_data.py
 ```
 
 This materializes `sklearn`'s built-in dataset to
-`data/raw/wine.csv` and writes its sha256 to `data/raw/CHECKSUMS.txt`. It's idempotent
+`data/raw/*.csv` and writes its sha256 to `data/raw/CHECKSUMS.txt`. It's idempotent
 — if the checksum already matches, it does nothing on a re-run.
 
 ## Splits
 
 Stratified 80/20 train/test split, `random_state=42` (see `config/default.yaml`'s
-`seed` and `split` keys), computed at runtime in `wine_origin.data.train_test_split_stratified`
+`seed` and `split` keys), computed at runtime in `cataclysm.data.train_test_split_stratified`
 — not stored as separate files, so there's exactly one raw file to keep an eye on. No
 overlap between train and test is verified by `tests/test_data.py`.
 

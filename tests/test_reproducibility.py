@@ -4,20 +4,20 @@ same seed must produce bit-identical metrics, not just "similar" ones.
 
 from __future__ import annotations
 
-from wine_origin.config import load_config
-from wine_origin.data import (
+from cataclysm.config import load_config
+from cataclysm.data import (
     materialize_raw_csv,
     split_features_target,
     train_test_split_stratified,
 )
-from wine_origin.evaluate import compute_metrics
-from wine_origin.models import build_active_model
-from wine_origin.utils import set_seed
+from cataclysm.evaluate import compute_metrics
+from cataclysm.models import build_active_model
+from cataclysm.utils import set_seed
 
 
 def _run_once(tmp_path, config):
     set_seed(config["seed"])
-    df = materialize_raw_csv(tmp_path / "wine.csv")
+    df = materialize_raw_csv(tmp_path / "*.csv")
     train_df, test_df = train_test_split_stratified(
         df, test_size=config["split"]["test_size"], seed=config["seed"]
     )

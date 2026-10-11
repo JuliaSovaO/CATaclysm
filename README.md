@@ -1,4 +1,4 @@
-# 🍷 wine-origin-classifier
+# CATaclysm
 
 Predicts which of 3 grape cultivars a wine came from, using 13 chemical measurements — a small, complete, fully-reproducible example project built from [`ucu-ai-course/project-template`](https://github.com/ucu-ai-course/project-template).
 
@@ -94,7 +94,7 @@ ruff check . && ruff format --check .
 
 ```
 .
-├── src/wine_origin/     # the package: config, data, models, evaluate, cli.py (the single entry point)
+├── src/cataclysm/     # the package: config, data, models, evaluate, cli.py (the single entry point)
 ├── scripts/              # download_data.py, run_experiment.py
 ├── app/                  # streamlit_app.py — the interactive demo (see app/README.md)
 ├── notebooks/             # 01-04, executed, narrative-first (see notebooks/README.md)
@@ -111,8 +111,8 @@ Everything above (except the placeholders in `docs/proposal|poster|slides/`) is 
 
 ## Reproducibility
 
-- **Seed**: `42`, set once in `config/default.yaml`, applied via `wine_origin.utils.set_seed()` to both `random` and `numpy`.
-- **Versions**: Python 3.13.14; see `requirements.txt` for pinned package versions. Every run's exact versions + OS + git commit are captured by `wine_origin.utils.env_info()` and written into `results/metrics.json`'s `env` field — that's what "reproducible" is checked against, not just claimed.
+- **Seed**: `42`, set once in `config/default.yaml`, applied via `cataclysm.utils.set_seed()` to both `random` and `numpy`.
+- **Versions**: Python 3.13.14; see `requirements.txt` for pinned package versions. Every run's exact versions + OS + git commit are captured by `cataclysm.utils.env_info()` and written into `results/metrics.json`'s `env` field — that's what "reproducible" is checked against, not just claimed.
 - **OS tested on**: macOS (arm64) locally; `.github/workflows/lint.yml` also runs on Ubuntu (`ubuntu-latest`) on every push — add a `test.yml` alongside it the same way if you want CI to run `pytest` too, not just lint.
 - **Runtime**: `make reproduce` takes well under a minute on a laptop — no GPU needed, no dataset download beyond what's bundled in scikit-learn.
 - **Known limitations**: 178 samples total means wide uncertainty on any single metric — see the CV std columns in the results table, and treat any one number with the same caution `results/experiments.md` applies to the random-forest test-set score.
@@ -137,7 +137,7 @@ Pre-commit hooks (installed by `make setup`) catch most of this before you even 
 
 | Tool | Used for | How the result was checked |
 |---|---|---|
-| GitHub Copilot | Autocomplete while writing `src/wine_origin/evaluate.py` | Read line by line; covered by `tests/test_reproducibility.py` and `tests/test_models.py` |
+| GitHub Copilot | Autocomplete while writing `src/cataclysm/evaluate.py` | Read line by line; covered by `tests/test_reproducibility.py` and `tests/test_models.py` |
 | ChatGPT | Explaining the difference between macro- and micro-averaged F1 before choosing which to report | Cross-checked against the scikit-learn docs for `f1_score` |
 | Claude | First draft of this README's prose | Rewritten by hand; every number was replaced with the actual value from `results/metrics.json`, not left as generated |
 
@@ -147,7 +147,7 @@ Pre-commit hooks (installed by `make setup`) catch most of this before you even 
 
 | Member | Contribution | Responsible for |
 |---|---|---|
-| Oleksandr Kosovan | 50% | `src/wine_origin/` (data, models, evaluate), `scripts/run_experiment.py`, notebooks 01–03, tests |
+| Oleksandr Kosovan | 50% | `src/cataclysm/` (data, models, evaluate), `scripts/run_experiment.py`, notebooks 01–03, tests |
 | Slavko Prytula | 50% | `cli.py`, `app/streamlit_app.py`, CI workflow, `docs/`, notebook 04, this README |
 
 Both members agree with the above distribution.

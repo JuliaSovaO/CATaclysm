@@ -4,7 +4,7 @@
 # directly (see README.md's Quick start / Development sections for the exact
 # commands); add more targets here only if your team actually wants the shortcut.
 
-PYTHON ?= python3.13
+PYTHON ?= python3.11
 VENV   := .venv
 BIN    := $(VENV)/bin
 
@@ -19,5 +19,5 @@ setup: ## Create .venv, install runtime+dev deps and this package, install pre-c
 
 reproduce: ## data -> train -> evaluate; prints the same metric as README.md's results table
 	$(BIN)/python scripts/download_data.py
-	$(BIN)/python -m wine_origin train
-	$(BIN)/python -m wine_origin evaluate
+	$(BIN)/python -m cataclysm train
+	$(BIN)/python -m cataclysm evaluate
