@@ -15,10 +15,12 @@ vf_coef: 0.5
 max_grad_norm: 0.5
 frame_stack: 4
 net:
-  type: mlp        # mlp | gru
+  type: mlp
   hidden: [64, 64]
   activation: tanh
 eval_every: 100000
 eval_episodes: 50
 checkpoint_dir: models/
-curriculum: [L0, L1, L2, L3]
+curriculum: [L0, L1, L2]   # ступені навчання, кроки діляться порівну
+target_kl: 0.05            # ранній вихід з епох, якщо політика змінилась занадто сильно
+eval_deterministic: false  # валідація семплує дії (як і ppo: у run_eval)

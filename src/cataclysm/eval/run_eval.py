@@ -19,12 +19,10 @@ TEST_SEED0 = 10000  # тестові seed 10000.., тренувальні 0..999
 def make_policy(name: str, cfg: dict, seed: int = 0):
     if name in BASELINES:
         return make_baseline(name, cfg, seed)
-    if name.startswith("ppo:"):
-        try:
-            from cataclysm.train.ppo_policy import load_policy  # реалізує Роль B
-        except ImportError as e:
-            raise ImportError("Для 'ppo:<шлях>' потрібен cataclysm.train.ppo_policy.load_policy (Роль B)") from e
-        return load_policy(name[4:], cfg)
+    if name.startswith(("ppo:", "ppo-det:")):
+        from cataclysm.train.ppo_policy import load_policy
+        det = name.startswith("ppo-det:")
+        return load_policy(name.split(":", 1)[1], cfg, deterministic=det, seed=seed)
     raise ValueError(f"Невідома політика: {name}")
 
 
@@ -51,23 +49,25 @@ def write_csv(rows: list[dict], path: str | Path) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--policy", required=True, help="random | greedy | reactive | ppo:<шлях>")
+    ap.add_argument("--policy", required=True, help="random | greedy | reactive | ppo:<шлях> | ppo-det:<шлях>")
     ap.add_argument("--level", default="L0")
     ap.add_argument("--episodes", type=int, default=200)
     ap.add_argument("--seed0", type=int, default=TEST_SEED0)
     ap.add_argument("--train-seed", type=int, default=None)
     ap.add_argument("--n-hunters", type=int, default=None)
+    ap.add_argument("--label", default=None, help="назва політики в CSV (за замовчуванням ppo/ppo-det без шляху)")
     ap.add_argument("--out", default=None)
     args = ap.parse_args()
 
     overrides = {"agents": {"n_hunters": args.n_hunters}} if args.n_hunters else None
     cfg = load_env_config(args.level, overrides)
     policy = make_policy(args.policy, cfg, seed=0)
-    rows = evaluate(policy, cfg, args.policy, args.level, args.episodes, args.seed0, args.train_seed)
+    label = args.label or args.policy.split(":")[0]
+    rows = evaluate(policy, cfg, label, args.level, args.episodes, args.seed0, args.train_seed)
     if args.out:
         write_csv(rows, args.out)
     s = summarize(rows)
-    print(f"{args.policy} @ {args.level}: success {s['success_rate']:.3f} "
+    print(f"{label} @ {args.level}: success {s['success_rate']:.3f} "
           f"[{s['success_ci_low']:.3f}, {s['success_ci_high']:.3f}], "
           f"steps(all) {s['steps_mean_all']:.0f}, steps(success) {s['steps_mean_success']:.0f}, "
           f"coll_obs {s['collisions_obstacle_mean']:.2f}, coll_agent {s['collisions_agent_mean']:.2f}")
