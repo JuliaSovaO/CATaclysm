@@ -238,3 +238,9 @@ models/*
 
 # Env secrets
 .env
+models/
+results/
+__pycache__/
+*.pyc
+.venv/
+*.pt
