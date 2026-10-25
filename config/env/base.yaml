@@ -1,0 +1,60 @@
+# Базова конфігурація середовища CATaclysm (SPEC v0.2). Власник: Роль A.
+# Усі значення з позначкою CALIBRATE треба виміряти на реальних роботах (SPEC, розділ 14).
+world:
+  arena_size_cm: [400, 300]     # CALIBRATE: 12 м2 підлоги, уточнити реальні розміри
+  dt_s: 0.2                     # крок керування, 5 Гц
+  max_steps: 500                # 100 с
+agents:
+  n_hunters: 2                  # у реальності лише 2 роботи
+  robot_radius_cm: 6.0          # CALIBRATE
+  v_forward_cm_s: 15.0          # CALIBRATE
+  omega_deg_s: 90.0             # CALIBRATE
+sensors:
+  ir:                           # IR-сенсор Rocky: один напрямок уперед
+    range_cm: 30.0              # CALIBRATE
+    half_angle_deg: 10.0        # CALIBRATE
+  light:                        # датчик світла Codey, джерело: ліхтарик на цілі
+    k: 20.0                     # CALIBRATE: сила сигналу
+    exponent: 1.0               # CALIBRATE: ефективний показник спаду (фізично 2)
+    d0_cm: 20.0                 # CALIBRATE: згладжування біля джерела
+    lobe_exponent: 1.0          # CALIBRATE: 0 = датчик усеспрямований; 1 = cos(кут) уперед
+    occlusion_factor: 0.1       # частка світла, що проходить повз перешкоду
+    ambient_range: [0.05, 0.05] # фонове освітлення кімнати (випадкове на епізод)
+    sigma: 0.002                # шум показань (частка шкали 0..1)
+    quant_step: 0.0             # 0.01 = цілі показання 0..100
+    delta_scale: 10.0           # множник для light_delta в observation
+  mate_ir:                      # IR TX/RX Codey: чи бачу товариша спереду
+    enabled: true               # CALIBRATE, потрібна перевірка, чи це працює на залізі
+    range_cm: 80.0
+    rx_half_angle_deg: 30.0
+    tx_half_angle_deg: 30.0
+    dropout_p: 0.0
+target:                         # ціль = лампа (ліхтарик)
+  mode: static                  # static | random_walk | flee (останні два поза обов'язковим обсягом)
+  radius_cm: 4.0
+  speed_ratio: 0.0              # частка v_forward для random_walk/flee
+  sense_radius_cm: 60.0         # лише для flee
+  capture_radius_cm: 20.0
+  capture_min_hunters: 1
+  capture_min_separation_deg: 0.0   # 0 = вимкнено; >0 вимагає, щоб ловили з різних боків
+  flee_weight_walls: 0.5
+  random_turn_sigma_deg: 15.0
+obstacles:
+  n_min: 0
+  n_max: 0
+  radius_cm: [3.0, 8.0]
+  min_clearance_cm: 12.0
+spawn:
+  min_hunter_target_dist_cm: 150.0
+  wall_margin_cm: 20.0
+noise:
+  ir_dist_sigma_frac: 0.0
+  move_sigma_frac: 0.0
+  turn_sigma_frac: 0.0
+  action_delay_steps: 0
+reward:
+  step: -0.01
+  shaping: 0.1
+  capture: 10.0
+  collision_obstacle: -0.2
+  collision_agent: -0.1

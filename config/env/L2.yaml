@@ -1,0 +1,17 @@
+# L2: додаються випадкові перешкоди і реалістичніший шум датчиків та руху.
+target:
+  capture_min_hunters: 2
+obstacles:
+  n_min: 3
+  n_max: 6
+sensors:
+  light:
+    ambient_range: [0.02, 0.20]
+    sigma: 0.005
+    quant_step: 0.01
+  mate_ir:
+    dropout_p: 0.05
+noise:
+  ir_dist_sigma_frac: 0.05
+  move_sigma_frac: 0.05
+  turn_sigma_frac: 0.05

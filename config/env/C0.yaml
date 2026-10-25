@@ -1,0 +1,19 @@
+# C0: відкалібрований L0 (реальна арена 2x2, реальний закон світла). Один робот достатньо.
+target:
+  capture_min_hunters: 1
+world:
+  arena_size_cm: [200, 200]     # виміряно користувачем: арена 2x2 м
+agents:
+  omega_deg_s: 150.0            # виміряно: ~30 град/крок
+sensors:
+  light:                        # яскравий ліхтарик, головний датчик Codey; 1.0 = показ 100
+    k: 14400.0                  # 1.44e6/d^2 у шкалі 0..100 (підгонка по 150 і 175 см)
+    exponent: 2.0
+    d0_cm: 5.0
+    lobe_exponent: 1.15         # cos^m, з кутів на 100 см (60 град -> 0.45 від осьового)
+    ambient_range: [0.003, 0.003]
+    sigma: 0.004
+    quant_step: 0.001
+spawn:
+  min_hunter_target_dist_cm: 100.0
+  wall_margin_cm: 15.0

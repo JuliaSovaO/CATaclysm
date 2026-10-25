@@ -1,0 +1,18 @@
+# L3: наближення до реальності: затримка команд і більший шум (за наявності часу).
+target:
+  capture_min_hunters: 2
+obstacles:
+  n_min: 3
+  n_max: 6
+sensors:
+  light:
+    ambient_range: [0.02, 0.25]
+    sigma: 0.01
+    quant_step: 0.01
+  mate_ir:
+    dropout_p: 0.10
+noise:
+  ir_dist_sigma_frac: 0.08
+  move_sigma_frac: 0.10
+  turn_sigma_frac: 0.10
+  action_delay_steps: 1
