@@ -1,145 +1,109 @@
-# data/ — data card
+# data/: data card
 
-> **Why this matters:** deciding a dataset's license and provenance *before* you start
-> building is a lot cheaper than discovering after your final report is written that
-> you're not actually allowed to redistribute it, or that you can't say where it came
-> from. Fill this file in as one of the first things you do, not the last.
+This folder holds the measurements we took on a real Codey Rocky robot with a bright flashlight. They are the source of the light law and the sensor cone used in the calibrated simulation levels `C0`-`C2` (`config/env/`). The simulation itself is not stored here.
 
 ## Name and source
 
-**UCI Wine Recognition Data**, accessed via `sklearn.datasets.load_wine`. Originally
-donated to the UCI Machine Learning Repository in 1991 by Forina, M. et al.,
-Institute of Pharmaceutical and Food Analysis and Technologies (Genoa, Italy). Results
-of a chemical analysis of wines grown in the same region of Italy, from three
-different cultivars.
+**CATaclysm light measurements**, collected by the team with our own Codey Rocky robot in our own test arena. The measurements were taken with `robot/measure_all.py` (mode 0, 20 samples per point). The script was uploaded to the robot from mBlock 5; the robot prints text lines to the mBlock monitor. No external dataset is used.
 
-- UCI page: <https://archive.ics.uci.edu/dataset/109/wine>
-- Bundled directly in scikit-learn — no external download needed, see "How to get it" below.
+## Measurement conditions
 
-## License and terms of use
+| Item | Value |
+|---|---|
+| Robot | Makeblock Codey Rocky |
+| Arena | flat floor, 200 x 200 cm |
+| Room | dark (in a lit room the background reading is about 5 out of 100, which spoils the signal) |
+| Light source | a bright flashlight pointed at the robot; the exact model was not recorded |
+| Main sensor | light sensor in the Codey head (`codey.light_sensor.get_value()`, scale 0-100) |
+| Other sensors recorded | Rocky `color_ir_sensor`: light strength (front), reflected infrared, reflected light, obstacle flag |
+| Distances and angles | set by hand, so each has an error of a few centimeters and a few degrees |
 
-No explicit license file accompanies the original 1991 UCI submission (it predates
-standard dataset-licensing practice). scikit-learn redistributes it as one of its
-built-in "toy datasets" for examples and teaching. Treat it as free to use for
-research and educational purposes; if you use it in a report or publication, cite
-the original source (see below) rather than just "scikit-learn". There are no known
-commercial-use restrictions, but because there's no formal license grant, avoid
-presenting it as your own collected data in anything beyond a course project context.
+## Files
 
-**Citation**, if you need one:
+| Path | What it is |
+|---|---|
+| `raw/light_distance_raw.txt` | text output of the distance series, as copied from the mBlock monitor; the label (distance) was added by hand after each block |
+| `raw/light_angle_raw.txt` | text output of the angle series at 100 cm, same format; the label (angle) is after each block |
+| `light_distance.csv` | decoded distance series, one row per point |
+| `light_angle.csv` | decoded angle series, one row per point |
+| `CHECKSUMS.txt` | sha256 of the four files above |
 
-> Forina, M. et al. (1991). *PARVUS — An Extendible Package for Data Exploration,
-> Classification and Correlation*. Institute of Pharmaceutical and Food Analysis and
-> Technologies, Via Brigata Salerno, 16147 Genoa, Italy.
+The raw files are text copied from the monitor panel; the line breaks come from the width of that panel. The CSV files are made from the raw files by joining the lines and reading the numbers.
 
-## Size and format
+## Schema of the CSV files
 
-- 178 samples, 13 numeric features, 3 classes (cultivars)
-- One CSV file, `data/raw/wine.csv`, ~11 KB
-- No train/test files on disk — the split is generated at runtime from a fixed seed (see "Splits" below), so there's only ever one raw file to keep in sync
+One row per measured point.
 
-## Schema
+| Column | Meaning |
+|---|---|
+| `idx` | point number set on the robot (button B) |
+| `n` | number of samples averaged (20) |
+| `distance_cm` | distance from the sensor to the flashlight |
+| `angle_deg` | angle between the head sensor axis and the direction to the flashlight (0 = facing the lamp) |
+| `head_mean`, `head_min`, `head_max`, `head_std` | head light sensor, scale 0-100 (the sensor used for calibration) |
+| `front_mean`, `front_min`, `front_max`, `front_std` | `color_ir_sensor.get_light_strength()` on Rocky; reads 100 at every distance with this flashlight, so it is not used |
+| `ir_mean`, `ir_min`, `ir_max`, `ir_std` | `color_ir_sensor.get_reflected_infrared()` |
+| `ref_mean`, `ref_min`, `ref_max`, `ref_std` | `color_ir_sensor.get_reflected_light()` |
+| `obstacle_frac` | fraction of samples where `is_obstacle_ahead()` was true |
 
-| Column | Type | Description | Units |
-|---|---|---|---|
-| `alcohol` | float | Alcohol content | % vol |
-| `malic_acid` | float | Malic acid | g/L |
-| `ash` | float | Ash | g/L |
-| `alcalinity_of_ash` | float | Alkalinity of ash | — |
-| `magnesium` | float | Magnesium | mg/L |
-| `total_phenols` | float | Total phenols | — |
-| `flavanoids` | float | Flavanoids | — |
-| `nonflavanoid_phenols` | float | Non-flavanoid phenols | — |
-| `proanthocyanins` | float | Proanthocyanins | g/L |
-| `color_intensity` | float | Color intensity | — |
-| `hue` | float | Hue | — |
-| `od280/od315_of_diluted_wines` | float | OD280/OD315 of diluted wines (protein content proxy) | — |
-| `proline` | float | Proline | mg/L |
-| `target` | int | Cultivar: `0`, `1`, or `2` | — |
+## What was measured
 
-## `data/raw/` vs. `data/interim/` vs. `data/processed/`
+**Distance series** (robot facing the lamp, angle 0):
 
-This project's pipeline is simple enough to go straight from `data/raw/wine.csv` to
-features in memory (see `src/cataclysm/features.py`) — so `data/interim/` and
-`data/processed/` are currently empty (just a `.gitkeep` each, so the folders exist
-after a fresh clone). If your project adds a real multi-step pipeline — e.g.
-cleaning/joining raw sources into an intermediate form, then engineering features from
-that — `data/interim/` is where the intermediate, not-yet-final form goes, and
-`data/processed/` is where the model-ready output goes. Same rule as `data/raw/`:
-never commit the files themselves, only document what's in them here.
+| Distance, cm | 10 | 20 | 30 | 50 | 90 | 130 | 150 | 175 |
+|---|---|---|---|---|---|---|---|---|
+| `head_mean` | 100 | 100 | 100 | 100 | 100 | 98.83 | 63.84 | 47.35 |
+| `head_std` | 0 | 0 | 0 | 0 | 0 | 0.11 | 0.81 | 0.15 |
 
-## How to get it
+**Angle series** (distance 100 cm):
 
-```bash
-python scripts/download_data.py
-```
+| Angle, deg | 0 | 30 | 45 | 60 | 90 |
+|---|---|---|---|---|---|
+| `head_mean` | 100 | 100 | 100 | 64.46 | 0.0 |
 
-This materializes `sklearn`'s built-in dataset to
-`data/raw/*.csv` and writes its sha256 to `data/raw/CHECKSUMS.txt`. It's idempotent
-— if the checksum already matches, it does nothing on a re-run.
+
+## How the data was used
+
+| Result | Used for |
+|---|---|
+| Signal is about `1.44e6 / d^2` on the 0-100 scale (fit on 150 and 175 cm; fitted exponent 1.94) | `sensors.light.k` and `exponent` in `config/env/C*.yaml` |
+| `cos^1.15` response to the angle (60 deg gives about 0.45 of the on-axis value, 90 deg gives 0) | `sensors.light.lobe_exponent` |
+| Saturation at 100 up to about 120 cm | readings are clipped to [0, 1] in the simulation |
+| Noise standard deviation 0.1 to 0.8 out of 100 | `sensors.light.sigma` |
+| Front Rocky light channel is always 100 | this channel is not part of the observation |
+
+The forward speed (15 cm/s) and the turn rate (about 150 deg/s) in the simulation come from separate motion tests (`robot/measure_all.py`, mode 2). The individual results of those tests are not stored in this folder.
 
 ## Splits
 
-Stratified 80/20 train/test split, `random_state=42` (see `config/default.yaml`'s
-`seed` and `split` keys), computed at runtime in `cataclysm.data.train_test_split_stratified`
-— not stored as separate files, so there's exactly one raw file to keep an eye on. No
-overlap between train and test is verified by `tests/test_data.py`.
+No train/test split: the data is used only to set parameters of the simulation, not to train a model.
 
 ## Personal data
 
-None. This is chemical measurement data with no connection to individuals.
+None. The files contain only sensor readings of a robot and the distances and angles of the measurement.
 
-## Scraping
+## Scraping and external sources
 
-Not applicable — this dataset was not scraped; it comes from a 1991 laboratory
-chemical analysis, redistributed via scikit-learn.
+Not applicable. All data was measured by the team.
 
-## Known limitations and biases
+## License and terms of use
 
-- Small (178 samples) — expect wide confidence intervals on any metric, and treat
-  single-run numbers with caution (see the "why one seed isn't enough" note in the
-  root README).
-- Mild class imbalance: 59 / 71 / 48 samples across the three cultivars.
-- All samples are from one region of Italy — a model trained on this data has not
-  seen wines from other regions, and nothing in the data or the model should be
-  assumed to generalize beyond similar cultivars.
+Collected by the team. Free to reuse with attribution (CC BY 4.0). The license of the code in this repository is separate.
+
+## Known limitations
+
+- The 130 cm point lies above the pure 1/d^2 curve (98.8 against about 85), so the sensor saturates softly, not like a hard clip.
+- The measurements depend on the specific flashlight and on the dark room. A different lamp or a lit room changes the readings.
 
 ## Ethical risks
 
-Low: this is chemical composition data with no personal, demographic, or otherwise
-sensitive information. The main risk is over-generalizing a model trained on 178
-samples from one region as if it said something universal about wine chemistry.
+Low: technical sensor data, no people, no personal information.
 
 ## Version and checksum
 
-`data/raw/CHECKSUMS.txt` (committed to git, unlike the data itself) records the
-sha256 of the exact file this project was built and tested against. Regenerate and
-compare with `python scripts/download_data.py`.
+`CHECKSUMS.txt` records the sha256 of the files in this folder. To verify:
 
----
-
-## If your project's data is too large or private for this pattern
-
-The pattern above — a small dataset, materialized on demand, checksum committed
-instead of the data — doesn't fit every project. If yours doesn't:
-
-- **Large but shareable**: Git LFS, DVC + cloud storage (S3/GCS/etc.), or Hugging Face
-  Datasets are all reasonable; pick based on whether your team already uses one of them.
-- **Already hosted elsewhere**: if the data already lives on Kaggle, just document the
-  dataset URL and the `kaggle datasets download <owner>/<dataset>` command (via the
-  `kaggle` CLI) instead of re-hosting it yourself.
-- **You need a DOI** (e.g. citing a specific dataset version in a paper or proposal):
-  Zenodo — same idea as the models/README.md Hugging Face pattern, but for data.
-- **Private (can't be public at all)**: keep it out of git entirely, document exactly
-  how to request access in this file, and note that CI/graders will need a documented
-  path to get it too.
-
-> [!warning]
-> `git rm big_or_private_file.csv` does **not** remove it from git history — the file
-> is still sitting in every commit before that removal, downloadable by anyone with
-> repo access. If a data file with real access restrictions is ever committed by
-> mistake, don't just delete it in a new commit: treat it like a leaked secret (see the
-> root README's note on that) and either rewrite history properly (`git filter-repo`)
-> before anyone else pulls, or accept it needs to be revoked/rotated at the source.
-> Deciding your storage approach *before* the first commit is much cheaper than fixing
-> this after the fact.
+```bash
+cd data
+sha256sum -c CHECKSUMS.txt
+```

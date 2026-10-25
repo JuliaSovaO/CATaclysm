@@ -1,4 +1,3 @@
-"""Візуалізація епізоду: кадр і GIF (SPEC, розділ 15). Роль A."""
 from __future__ import annotations
 
 import matplotlib
